@@ -28,7 +28,7 @@ const { chains, publicClient } = configureChains(
 );
 
 const { connectors } = getDefaultWallets({
-  appName: ".town by Opti.Domains",
+  appName: "Sui Axelar USDC Bridge",
   projectId: "dd2a5d8744a5d72247899ef644bf8e1e",
   chains,
 });

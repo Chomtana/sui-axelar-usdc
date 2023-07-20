@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import ethLogo from './assets/eth.png'
 import suiLogo from './assets/sui.png'
@@ -6,13 +6,44 @@ import { Button, Input } from 'antd'
 import BridgeButton from './components/BridgeButton';
 
 import {
-  ConnectButton as SuiConnectButton,
+  ConnectButton as SuiConnectButton, useSuiProvider, useWallet,
 } from "@suiet/wallet-kit";
 import '@suiet/wallet-kit/style.css';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount, useContractRead } from 'wagmi';
+
+import ERC20ABI from "./abi/ERC20.json"
+import { JsonRpcProvider, testnetConnection } from '@mysten/sui.js';
+
+const USDC_ADDRESS: `0x${string}` = '0x254d06f33bDc5b8ee05b2ea472107E300226659A'
+const SUI_PACKAGE_ADDRESS = '0x17980b5cb73f1bf74b2ff98ead3d088e578397217a989b0985463a8e3b8a57f7'
+
+const suiProvider = new JsonRpcProvider(testnetConnection);
 
 function App() {
   const [ amountStr, setAmount ] = useState("");
+
+  const wallet = useWallet();
+
+  const { address } = useAccount();
+
+  const { data: sourceBalance, isError: isSourceBalanceError, isLoading: isSourceBalanceLoading } = useContractRead({
+    address: USDC_ADDRESS,
+    abi: ERC20ABI,
+    functionName: 'balanceOf',
+    args: [address],
+  })
+
+  const [ suiBalance, setSuiBalance ] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (wallet.address) {
+      suiProvider.getBalance({
+        owner: wallet.address,
+        coinType: SUI_PACKAGE_ADDRESS + '::chomusdc::CHOMUSDC',
+      }).then(result => setSuiBalance(result.totalBalance))
+    }
+  }, [ wallet ])
 
   return (
     <div className='p-4 max-w-2xl m-auto'>
@@ -54,7 +85,7 @@ function App() {
           </div>
 
           <div>
-            Balance: 500 USDC
+            Balance: {isSourceBalanceLoading || isSourceBalanceError ? '...' : (parseFloat(sourceBalance as any) / 1000000).toFixed(2)} USDC
           </div>
         </div>
 
@@ -73,17 +104,17 @@ function App() {
           </div>
 
           <div className='text-xl mt-2 mb-3'>
-            {amountStr} USDC
+            {amountStr || '...'} USDC
           </div>
 
           <div>
-            Balance: 500 USDC
+            Balance: {suiBalance === null ? '...' : (parseFloat(suiBalance) / 100).toFixed(2)} USDC
           </div>
         </div>
       </div>
 
       <div className='text-center mb-2'>
-        Connect both wallets to bridge
+        Connect both wallets to bridge<br/>Please use SUI <b><u>TESTNET</u></b><br/>You must disconnect and connect again<br/>after switching chain to <b><u>TESTNET</u></b>
       </div>
 
       <div className='flex flex-col md:flex-row items-center justify-center mb-2'>
@@ -97,7 +128,7 @@ function App() {
       </div>
 
       <div className='flex justify-center mb-6'>
-        <BridgeButton></BridgeButton>
+        <BridgeButton amount={parseFloat(amountStr)}></BridgeButton>
       </div>
     </div>
   )
