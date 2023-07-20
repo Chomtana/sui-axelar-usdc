@@ -107,6 +107,18 @@ module axelar::chomusdc_test {
             );
         };
 
+        // Should fail
+        // test_scenario::next_tx(scenario, relayer);
+        // {
+        //     let ctx = test_scenario::ctx(scenario);
+        //     chomusdc::mint(
+        //         &mut treasury_gate,
+        //         &mut axelar,
+        //         msg_id,
+        //         ctx
+        //     );
+        // };
+
         test_scenario::return_shared(treasury_gate);
         test_scenario::return_shared(axelar);
 
