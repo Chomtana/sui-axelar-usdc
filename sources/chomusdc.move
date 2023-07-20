@@ -8,7 +8,7 @@ module axelar::chomusdc {
     use std::option;
     use sui::coin::{Self, Coin, TreasuryCap};
     use sui::transfer;
-    use sui::tx_context::{Self, TxContext};
+    use sui::tx_context::{TxContext};
     use sui::object::{Self, UID};
     use axelar::messenger::{Self, Axelar, Channel};
 
@@ -30,16 +30,21 @@ module axelar::chomusdc {
         let (treasury_cap, metadata) = coin::create_currency<CHOMUSDC>(witness, 2, b"USDC", b"USDC (Chom)", b"A fake USDC token developed for axelar hackathon", option::none(), ctx);
 
         transfer::public_freeze_object(metadata);
-        transfer::public_transfer(treasury_cap, tx_context::sender(ctx));
+        // transfer::public_transfer(treasury_cap, tx_context::sender(ctx));
+
+        sui::transfer::share_object(TreasuryGate {
+            id: object::new(ctx),
+            channel: messenger::create_channel(treasury_cap, ctx)
+        })
     }
 
     /// Create and share a new TreasuryGate object.
-    public entry fun create_gate(cap: TreasuryCap<CHOMUSDC>, ctx: &mut TxContext) {
-        sui::transfer::share_object(TreasuryGate {
-            id: object::new(ctx),
-            channel: messenger::create_channel(cap, ctx)
-        })
-    }
+    // public entry fun create_gate(cap: TreasuryCap<CHOMUSDC>, ctx: &mut TxContext) {
+    //     sui::transfer::share_object(TreasuryGate {
+    //         id: object::new(ctx),
+    //         channel: messenger::create_channel(cap, ctx)
+    //     })
+    // }
 
     fun mint_from_axelar(treasury_cap: &mut TreasuryCap<CHOMUSDC>, payload: &vector<u8>, ctx: &mut TxContext) {
         let bcs = bcs::new(*payload);

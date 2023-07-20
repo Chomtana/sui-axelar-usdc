@@ -2,8 +2,7 @@
 #[test_only]
 module axelar::chomusdc_test {
     use sui::test_scenario;
-    use sui::coin::{TreasuryCap};
-    use axelar::chomusdc::{Self, CHOMUSDC, TreasuryGate};
+    use axelar::chomusdc::{Self, TreasuryGate};
     use axelar::messenger::{Self, Axelar};
 
     #[test]
@@ -15,18 +14,18 @@ module axelar::chomusdc_test {
             let ctx = test_scenario::ctx(scenario);
             chomusdc::test_init(ctx);
         };
-        test_scenario::next_tx(scenario, owner);
-        {
-            assert!(test_scenario::has_most_recent_for_sender<TreasuryCap<CHOMUSDC>>(scenario), 0);
-        };
+        // test_scenario::next_tx(scenario, owner);
+        // {
+        //     assert!(test_scenario::has_most_recent_for_sender<TreasuryCap<CHOMUSDC>>(scenario), 0);
+        // };
 
-        let treasury_cap = test_scenario::take_from_sender<TreasuryCap<CHOMUSDC>>(scenario);
+        // let treasury_cap = test_scenario::take_from_sender<TreasuryCap<CHOMUSDC>>(scenario);
 
-        test_scenario::next_tx(scenario, owner);
-        {
-            let ctx = test_scenario::ctx(scenario);
-            chomusdc::create_gate(treasury_cap, ctx);
-        };
+        // test_scenario::next_tx(scenario, owner);
+        // {
+        //     let ctx = test_scenario::ctx(scenario);
+        //     chomusdc::create_gate(treasury_cap, ctx);
+        // };
 
         test_scenario::next_tx(scenario, owner);
         {
@@ -49,18 +48,18 @@ module axelar::chomusdc_test {
             chomusdc::test_init(ctx);
         };
 
-        test_scenario::next_tx(scenario, owner);
-        {
-            assert!(test_scenario::has_most_recent_for_sender<TreasuryCap<CHOMUSDC>>(scenario), 0);
-        };
+        // test_scenario::next_tx(scenario, owner);
+        // {
+        //     assert!(test_scenario::has_most_recent_for_sender<TreasuryCap<CHOMUSDC>>(scenario), 0);
+        // };
 
-        let treasury_cap = test_scenario::take_from_sender<TreasuryCap<CHOMUSDC>>(scenario);
+        // let treasury_cap = test_scenario::take_from_sender<TreasuryCap<CHOMUSDC>>(scenario);
 
-        test_scenario::next_tx(scenario, owner);
-        {
-            let ctx = test_scenario::ctx(scenario);
-            chomusdc::create_gate(treasury_cap, ctx);
-        };
+        // test_scenario::next_tx(scenario, owner);
+        // {
+        //     let ctx = test_scenario::ctx(scenario);
+        //     chomusdc::create_gate(treasury_cap, ctx);
+        // };
 
         test_scenario::next_tx(scenario, owner);
         {
