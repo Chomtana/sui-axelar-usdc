@@ -82,7 +82,8 @@ module axelar::chomusdc_test {
 
         let axelar = test_scenario::take_shared<Axelar>(scenario);
 
-        let message = x"00";
+        // See bcs/index.js
+        let message = x"af969c1f9fdfc4feb078692da243e27fac40d107a9948317f0b2120a1422ae358096980000000000e78787a09f2c0000";
         let msg_id = sui::hash::keccak256(&message);
 
         test_scenario::next_tx(scenario, relayer);

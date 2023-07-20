@@ -2,5 +2,9 @@
   "name": "bcs",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@mysten/bcs": "^0.7.3"
+  }
 }
