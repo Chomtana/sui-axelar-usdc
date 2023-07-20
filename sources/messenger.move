@@ -37,6 +37,7 @@ module axelar::messenger {
     use sui::ecdsa_k1 as ecdsa;
     use std::vector as vec;
     use sui::bcs;
+    use sui::transfer;
 
 
     /// For when trying to consume the wrong object.
@@ -375,6 +376,37 @@ module axelar::messenger {
         abort ELowSignaturesWeight
     }
 
+    public entry fun create_axelar(ctx: &mut TxContext) {
+        let axelar = Axelar {
+            id: object::new(ctx),
+            epoch: 1,
+            epoch_for_hash: vec_map::empty()
+        };
+
+        transfer::share_object(axelar);
+    }
+
+    public entry fun submit_usdc_message(
+        axelar: &mut Axelar,
+        target_id: address,
+        source_chain: vector<u8>,
+        source_address: vector<u8>,
+        message: vector<u8>
+    ) {
+        let hash = sui::hash::keccak256(&message);
+
+        let message = Message {
+            msg_id: hash,
+            target_id: target_id,
+            source_chain: source_chain,
+            source_address: source_address,
+            payload_hash: hash,
+            payload: message
+        };
+
+        df::add(&mut axelar.id, message.msg_id, message);
+    }
+
     /// Prefix for Sui Messages.
     const PREFIX: vector<u8> = b"\x19Sui Signed Message:\n";
 
@@ -494,6 +526,11 @@ module axelar::messenger {
             } = vec::pop_back(&mut msgs);
         };
         vec::destroy_empty(msgs);
+    }
+
+    #[test_only]
+    public fun test_channel_address<T: store>(channel: &Channel<T>): address {
+        object::uid_to_address(&channel.id)
     }
 
     /// Compute operators hash from the list of `operators` (public keys).

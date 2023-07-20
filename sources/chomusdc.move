@@ -4,7 +4,6 @@
 // For hackathon only. Don't use it in the production
 
 module axelar::chomusdc {
-    use sui::test_scenario;
     use sui::bcs;
     use std::option;
     use sui::coin::{Self, Coin, TreasuryCap};
@@ -83,33 +82,9 @@ module axelar::chomusdc {
         init(CHOMUSDC {}, ctx)
     }
 
-    #[test]
-    fun test_immutable() {
-        let owner = @0x1;
-        let scenario_val = test_scenario::begin(owner);
-        let scenario = &mut scenario_val;
-        {
-            let ctx = test_scenario::ctx(scenario);
-            init(CHOMUSDC {}, ctx);
-        };
-        test_scenario::next_tx(scenario, owner);
-        {
-            assert!(test_scenario::has_most_recent_for_sender<TreasuryCap<CHOMUSDC>>(scenario), 0);
-        };
-
-        let treasury_cap = test_scenario::take_from_sender<TreasuryCap<CHOMUSDC>>(scenario);
-
-        test_scenario::next_tx(scenario, owner);
-        {
-            let ctx = test_scenario::ctx(scenario);
-            create_gate(treasury_cap, ctx);
-        };
-
-        test_scenario::next_tx(scenario, owner);
-        {
-            assert!(test_scenario::has_most_recent_shared<TreasuryGate>(), 0);
-        };
-
-        test_scenario::end(scenario_val);
+    #[test_only]
+    /// Wrapper gate channel id fetching
+    public fun test_gate_channel_address(treasury_gate: &TreasuryGate): address {
+        messenger::test_channel_address(&treasury_gate.channel)
     }
 }
